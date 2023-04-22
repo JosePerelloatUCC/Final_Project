@@ -2,18 +2,15 @@ package com.example.finalproject.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.finalproject.ui.Screens.mainScreen
+import com.example.finalproject.ui.Screens.ChooseHabits
+import com.example.finalproject.ui.Screens.ListofHabits
 
 enum class HabitAppScreens() {
     MAIN_SCREEN,
@@ -21,8 +18,8 @@ enum class HabitAppScreens() {
     CHECK_PROGRESS
 }
 
-/*@Composable
-fun SimpleAppScreens(
+@Composable
+fun HabitApp(
     modifier: Modifier = Modifier,
     ProjectViewModel: ProjectViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
@@ -32,13 +29,22 @@ fun SimpleAppScreens(
 
     NavHost(
         navController = navController,
-        startDestination = HabitAppScreens.MAIN_SCREEN.name ,)
+        startDestination = HabitAppScreens.CHOOSE_HABITS.name ,)
     {
         composable(route = HabitAppScreens.MAIN_SCREEN.name) {
-            mainScreen(
+            /*ListofHabits(
                 onHabitslistButtonClicked = {
                     navController.navigate(HabitAppScreens.CHOOSE_HABITS.name) },
-            )
+            )*/
+        }
+        composable(route = HabitAppScreens.CHOOSE_HABITS.name) {
+            ChooseHabits(
+                uiState.habitDescription,
+                uiState.timeofNotification,
+                uiState.userNotification
+            ) {
+
+            }
         }
     }
-}*/
+}

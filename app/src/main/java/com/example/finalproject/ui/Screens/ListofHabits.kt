@@ -5,14 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import com.example.finalproject.ui.SimpleAppScreens
 
 @ExperimentalMaterial3Api
 @Composable
-fun mainScreen(
+fun ListofHabits(
 
 ) {
     val intent = Intent(Intent.ACTION_SEND).apply {
@@ -25,7 +22,7 @@ fun mainScreen(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = {onHabitslistButtonClicked}) {
+            FloatingActionButton(onClick = {/*TODO: onHabitslistButtonClicked*/}) {
 
             }
         },
