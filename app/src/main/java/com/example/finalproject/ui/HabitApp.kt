@@ -1,16 +1,17 @@
 package com.example.finalproject.ui
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.finalproject.ui.Screens.ChooseHabits
-import com.example.finalproject.ui.Screens.ListofHabits
 
 enum class HabitAppScreens() {
     MAIN_SCREEN,
@@ -25,7 +26,7 @@ fun HabitApp(
     navController: NavHostController = rememberNavController()
 ) {
     val uiState by ProjectViewModel.uiState.collectAsState()
-
+    ProjectViewModel.loadHabitList(context = LocalContext.current)
 
     NavHost(
         navController = navController,
@@ -41,10 +42,12 @@ fun HabitApp(
             ChooseHabits(
                 uiState.habitDescription,
                 uiState.timeofNotification,
-                uiState.userNotification
-            ) {
-
-            }
+                uiState.userNotification,
+                onSaveClick = {
+                    context, habitDescription, notificaitonTime, isNotified ->
+                    ProjectViewModel.saveHabitfromUser(context, habitDescription, notificaitonTime, isNotified)
+                }
+            )
         }
     }
 }

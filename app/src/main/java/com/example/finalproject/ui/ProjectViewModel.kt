@@ -1,20 +1,18 @@
 package com.example.finalproject.ui
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.flow.*
 import java.util.*
 
 
 data class FinalProjectUIState(
     val habitDescription: String = "",
     val timeofNotification: Int = -1,
-    val userNotification: Boolean = false,
-    val habitList: MutableList<Habit> = mutableListOf<Habit>()
+    val userNotification: Boolean = false
 )
 
 data class Habit(
@@ -25,8 +23,10 @@ data class Habit(
 )
 
 class ProjectViewModel : ViewModel() {
+    private val _habitList: MutableList<Habit> = mutableListOf<Habit>()
+
     private val _uiState = MutableStateFlow(FinalProjectUIState())
-    val uiState: StateFlow<FinalProjectUIState> = _uiState.asStateFlow()
+    val uiState: StateFlow<FinalProjectUIState> = _uiState.asStateFlow() //read-only
 
     fun saveHabitfromUser(context: Context, name: String, time: Int, notification: Boolean) {
         val habitz = context.getSharedPreferences("user_habits", Context.MODE_PRIVATE)
@@ -39,33 +39,39 @@ class ProjectViewModel : ViewModel() {
         //save this list into shared preferences
         _uiState.update {
             currentState -> currentState.copy(
-            //habitList = currentState.habitList.addAll(newHabit)
+                habitDescription = name,
+                timeofNotification = time,
+                userNotification = notification
             )
         }
 
+        _habitList.add(Habit(name, time, notification))
+
+        var lastHabit = if(_habitList.isEmpty()) null else _habitList.last()
+        Log.d("ProjectViewModel.kt:saveHabitfromUser","LastHabit = ${lastHabit}") // just testing that our last habit gets added to list
+
         val gson = Gson()
-        val json = gson.toJson(newHabit)
-        habitz.edit().putString("MyObject", json).apply()
+        val json = gson.toJson(_habitList)
+        habitz.edit().putString("_habitList", json).apply()
     }
 
-    fun getUserHabit(context: Context): String? {
+    fun loadHabitList(context: Context) {
+        val gson = Gson()
         val habitz = context.getSharedPreferences("user_habits", Context.MODE_PRIVATE)
-        return habitz.getString("Habit_name", null)
+        var json: String? = habitz.getString ("_habitList", null)
+
+        Log.d("ProjectViewModel.kt:loadHabitList", "Loading json: ${json}")
+
+        if(json != null) {
+            val listOfMyClassObject = object : TypeToken<ArrayList<Habit>?>() {}.type
+            val gson = Gson()
+            val outputList: List<Habit> = gson.fromJson(json, listOfMyClassObject)
+            _habitList.addAll(outputList)
+        }
+
+        Log.d("ProjectViewModel.kt:loadHabitList", "Loaded: ${_habitList}")
     }
 
-    fun getUserTime(context: Context): Int? {
-        val habitTime = context.getSharedPreferences("user_habits", Context.MODE_PRIVATE)
-        return habitTime.getInt("Time_for_notification", -1)
-    }
-
-    fun getUserNotify(context: Context): Boolean? {
-        val wantNotify = context.getSharedPreferences("user_habits", Context.MODE_PRIVATE)
-        return wantNotify.getBoolean("Set_reminder", false)
-    }
-
-    fun onSaveClicked() {
-
-    }
 }
 
 

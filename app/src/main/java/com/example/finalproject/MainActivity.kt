@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.finalproject.ui.HabitApp
+import com.example.finalproject.ui.ProjectViewModel
 import com.example.finalproject.ui.theme.FinalProjectTheme
 
 @OptIn(ExperimentalMaterial3Api::class)

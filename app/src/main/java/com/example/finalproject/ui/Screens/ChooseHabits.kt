@@ -1,5 +1,6 @@
 package com.example.finalproject.ui.Screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Switch
@@ -9,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.finalproject.ui.*
 
@@ -31,15 +31,9 @@ fun ChooseHabits(
     userhabit:String,
     notificationTime:Int,
     userAlarm:Boolean,
-    onSaveClick:() -> Unit
+    onSaveClick: (Context, String, Int, Boolean) -> Unit
 ) {
     val context = LocalContext.current
-
-    /*var thisHabit: String = ""
-    var thisNotificationTime: String = ""
-    var thisNotify: Boolean = false
-
-     */
 
     var descriptionText by remember {
         mutableStateOf("")
@@ -64,19 +58,14 @@ fun ChooseHabits(
         TextField(value = timeText, onValueChange = { timeText = it })
         Switch(checked = notify, onCheckedChange = { notify = it })
         Spacer(modifier = Modifier.height(50.dp))
-        Button(onClick =  {
-            saveHabitfromUser(
-                context,
-                descriptionText,
-                timeText.toInt(),
-                notify
-            )
-        }) {
+        Button(onClick =  { onSaveClick(context, descriptionText, timeText.toInt(), notify) }) {
             Text("Save Habit options")
         }
-        Text("Habit is, ${getUserHabit(context) ?: "No habits, Try adding one"}!")
-        Text("Time for habit is, ${getUserTime(context) ?: "No time"}!")
-        Text("want notify?, ${getUserNotify(context) ?: "false"}!")
+        Spacer(modifier = Modifier.height(20.dp))
+        Text("Here's your latest addition")
+        Text("Habit is, ${userhabit}!")
+        Text("Time for habit is, ${notificationTime}!")
+        Text("want notify?, ${userAlarm}!")
 
     }
 
