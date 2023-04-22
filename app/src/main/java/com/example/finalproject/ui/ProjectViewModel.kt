@@ -1,42 +1,77 @@
 package com.example.finalproject.ui
 
 import android.content.Context
-import androidx.compose.runtime.Composable
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.flow.*
+import java.util.*
 
-data class FinalProjectUIState (
-    val temp:Int = 0
-        )
 
-class ProjectViewModel: ViewModel() {
+data class FinalProjectUIState(
+    val habitDescription: String = "",
+    val timeofNotification: Int = -1,
+    val userNotification: Boolean = false
+)
+
+data class Habit(
+    val description: String,
+    val notificationHour: Int,
+    val isNotified: Boolean,
+    val userCompleted: List<Date> = listOf()
+)
+
+class ProjectViewModel : ViewModel() {
+    private val _habitList: MutableList<Habit> = mutableListOf<Habit>()
+
     private val _uiState = MutableStateFlow(FinalProjectUIState())
-    val uiState: StateFlow<FinalProjectUIState> = _uiState.asStateFlow()
+    val uiState: StateFlow<FinalProjectUIState> = _uiState.asStateFlow() //read-only
+
+    fun saveHabitfromUser(context: Context, name: String, time: Int, notification: Boolean) {
+        val habitz = context.getSharedPreferences("user_habits", Context.MODE_PRIVATE)
+        /*habitz.edit().putString("Habit_name", name).apply()
+        habitz.edit().putInt("Time_for_notification", time).apply()
+        habitz.edit().putBoolean("Set_reminder", notification).apply()*/
+
+        val newHabit = Habit(name, time, notification)
+        //add habit to your list of habits
+        //save this list into shared preferences
+        _uiState.update {
+            currentState -> currentState.copy(
+                habitDescription = name,
+                timeofNotification = time,
+                userNotification = notification
+            )
+        }
+
+        _habitList.add(Habit(name, time, notification))
+
+        var lastHabit = if(_habitList.isEmpty()) null else _habitList.last()
+        Log.d("ProjectViewModel.kt:saveHabitfromUser","LastHabit = ${lastHabit}") // just testing that our last habit gets added to list
+
+        val gson = Gson()
+        val json = gson.toJson(_habitList)
+        habitz.edit().putString("_habitList", json).apply()
+    }
+
+    fun loadHabitList(context: Context) {
+        val gson = Gson()
+        val habitz = context.getSharedPreferences("user_habits", Context.MODE_PRIVATE)
+        var json: String? = habitz.getString ("_habitList", null)
+
+        Log.d("ProjectViewModel.kt:loadHabitList", "Loading json: ${json}")
+
+        if(json != null) {
+            val listOfMyClassObject = object : TypeToken<ArrayList<Habit>?>() {}.type
+            val gson = Gson()
+            val outputList: List<Habit> = gson.fromJson(json, listOfMyClassObject)
+            _habitList.addAll(outputList)
+        }
+
+        Log.d("ProjectViewModel.kt:loadHabitList", "Loaded: ${_habitList}")
+    }
+
 }
 
 
-fun saveHabitfromUser(context: Context, name: String, time: Int, notification: Boolean) {
-    val habitz = context.getSharedPreferences("user_habits", Context.MODE_PRIVATE)
-    habitz.edit().putString("Habit_name", name).apply()
-    val settime = context.getSharedPreferences("Time_reminder", Context.MODE_PRIVATE)
-    settime.edit().putInt("Time_for_notification", time).apply()
-    val  notify = context.getSharedPreferences("Want_reminder?", Context.MODE_PRIVATE)
-    notify.edit().putBoolean("Set_reminder", notification).apply()
-}
-
-fun getUserHabit(context: Context) : String? {
-    val habitz = context.getSharedPreferences("user_habits", Context.MODE_PRIVATE)
-    return habitz.getString("Habit_name", null)
-}
-
-fun getUserTime(context: Context) : Int? {
-    val habitTime = context.getSharedPreferences("Time_reminder", Context.MODE_PRIVATE)
-    return habitTime.getInt("Time_for_notification", -1)
-}
-
-fun getUserNotify(context: Context) : Boolean? {
-    val wantNotify = context.getSharedPreferences("Want_reminder?", Context.MODE_PRIVATE)
-    return wantNotify.getBoolean("Set_reminder", false)
-}
