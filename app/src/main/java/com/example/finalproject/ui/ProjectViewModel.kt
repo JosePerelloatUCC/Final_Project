@@ -1,6 +1,10 @@
 package com.example.finalproject.ui
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
@@ -24,6 +28,7 @@ data class Habit(
 
 class ProjectViewModel : ViewModel() {
     private val _habitList: MutableList<Habit> = mutableListOf<Habit>()
+    var habits: List<Habit> = _habitList.toList()
 
     private val _uiState = MutableStateFlow(FinalProjectUIState())
     val uiState: StateFlow<FinalProjectUIState> = _uiState.asStateFlow() //read-only
@@ -46,6 +51,7 @@ class ProjectViewModel : ViewModel() {
         }
 
         _habitList.add(Habit(name, time, notification))
+        habits = _habitList.toList() //TODO fix this in the future. Not proper way to do it.
 
         var lastHabit = if(_habitList.isEmpty()) null else _habitList.last()
         Log.d("ProjectViewModel.kt:saveHabitfromUser","LastHabit = ${lastHabit}") // just testing that our last habit gets added to list
@@ -67,6 +73,7 @@ class ProjectViewModel : ViewModel() {
             val gson = Gson()
             val outputList: List<Habit> = gson.fromJson(json, listOfMyClassObject)
             _habitList.addAll(outputList)
+            habits = _habitList.toList()
         }
 
         Log.d("ProjectViewModel.kt:loadHabitList", "Loaded: ${_habitList}")

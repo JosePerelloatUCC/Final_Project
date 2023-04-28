@@ -12,12 +12,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.finalproject.ui.Screens.ChooseHabits
+import com.example.finalproject.ui.Screens.ListofHabits
 
 enum class HabitAppScreens() {
     MAIN_SCREEN,
     CHOOSE_HABITS,
     CHECK_PROGRESS
 }
+
 
 @Composable
 fun HabitApp(
@@ -30,13 +32,14 @@ fun HabitApp(
 
     NavHost(
         navController = navController,
-        startDestination = HabitAppScreens.CHOOSE_HABITS.name ,)
+        startDestination = HabitAppScreens.MAIN_SCREEN.name ,)
     {
         composable(route = HabitAppScreens.MAIN_SCREEN.name) {
-            /*ListofHabits(
-                onHabitslistButtonClicked = {
+            ListofHabits(
+                habits = ProjectViewModel.habits,
+                onCreatenewHabitClick = {
                     navController.navigate(HabitAppScreens.CHOOSE_HABITS.name) },
-            )*/
+            )
         }
         composable(route = HabitAppScreens.CHOOSE_HABITS.name) {
             ChooseHabits(
